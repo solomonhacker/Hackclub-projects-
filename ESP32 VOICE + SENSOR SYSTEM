@@ -1,0 +1,87 @@
+ESP32 VOICE + SENSOR SYSTEM
+
+#include <Arduino.h>
+
+// Ultrasonic pins
+#define trigHead 5
+#define echoHead 18
+
+#define trigGround 19
+#define echoGround 21
+
+#define buzzer 23
+#define flamePin 34
+
+long duration;
+int headDist;
+int groundDist;
+
+// Simple speak function (simulate voice with tones)
+void speak(String msg) {
+  Serial.println(msg);  // For debugging
+}
+
+int getDistance(int trig, int echo) {
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  long duration = pulseIn(echo, HIGH);
+  return duration * 0.034 / 2;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(trigHead, OUTPUT);
+  pinMode(echoHead, INPUT);
+
+  pinMode(trigGround, OUTPUT);
+  pinMode(echoGround, INPUT);
+
+  pinMode(buzzer, OUTPUT);
+  pinMode(flamePin, INPUT);
+}
+
+void loop() {
+  headDist = getDistance(trigHead, echoHead);
+  groundDist = getDistance(trigGround, echoGround);
+
+  int fire = digitalRead(flamePin);
+
+  // 🔥 Fire detection
+  if (fire == 1) {
+    speak("Warning fire detected");
+    tone(buzzer, 3000);
+    delay(1000);
+    return;
+  }
+
+  // 🧠 Smart logic
+  if (headDist < 50) {
+    speak("Obstacle ahead at head level");
+    tone(buzzer, 2000);
+  } 
+  else if (groundDist < 50) {
+    speak("Step or obstacle below");
+    tone(buzzer, 1500);
+  } 
+  else if (headDist < 100) {
+    speak("Object ahead at " + String(headDist) + " centimeters");
+  } 
+  else {
+    noTone(buzzer);
+  }
+
+  delay(300);
+}
+
+
+
+
+even use this for voice because i never combined the one code
+void speak(int track) {
+  myDFPlayer.play(track);
+}
