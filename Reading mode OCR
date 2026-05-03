@@ -1,0 +1,46 @@
+BUTTON + MODE CONTROL (ESP32 CODE)
+#define buttonPin 4
+
+bool readingMode = false;
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  Serial.begin(115200);
+}
+
+void loop() {
+  if (digitalRead(buttonPin) == LOW) {
+    delay(300); // debounce
+    readingMode = true;
+    Serial.println("READ_MODE");
+  }
+
+  if (readingMode) {
+    // Trigger camera capture
+    Serial.println("CAPTURE_IMAGE");
+
+    delay(2000); // wait before next read
+    readingMode = false;
+  }
+}
+
+
+called code when the key is presses friends 
+
+#include "esp_camera.h"
+
+void captureImage() {
+  camera_fb_t * fb = esp_camera_fb_get();
+
+  if (!fb) {
+    Serial.println("Camera capture failed");
+    return;
+  }
+
+  Serial.println("solomon Image captured");
+
+  // Normally you would send or process image here
+
+  esp_camera_fb_return(fb);
+}
+
